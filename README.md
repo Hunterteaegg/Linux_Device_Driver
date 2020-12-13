@@ -17,7 +17,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ## DESCRIPTION
-    This repository is used to store and backup some sensors or devices drivers used in Linux of Raspberrypi. Here is my compile environment below: 
+    This repository is used to store and backup some sensors or devices drivers used in Linux of Raspberrypi.
+    Here is my compilation environment below: 
     - Kernel : aarch64 Linux 5.4.0-1023-raspi
     - OS : Ubuntu 20.04 focal
     - CPU : BCM2835 @ 4x 1.2GHz

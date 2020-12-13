@@ -77,7 +77,7 @@ typedef struct {
 #define SHT31_COM_RESET_L           0xA2    //reset Command (LSB)
 /***** Private Macro Definition end *****/
 
-/****** Public Interfaces ******/
+/***** Public Interfaces start *****/
 /* @brief Init SHT31 device.
  * @param adapter_node I2C_adapter node, can be seen in /dev/i2c-*
  * @return 0 means successed but -1 means failed. 
@@ -112,5 +112,7 @@ int SHT31_deinit(void);
  * @return The result of CRC-8 of sample
  */
 u8 CRC8_compute(const u8 *pdat, const short len, const u8 factor);
+
+/***** Public Interfaces end *****/
 
 #endif
