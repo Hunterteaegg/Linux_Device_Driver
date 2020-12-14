@@ -23,6 +23,7 @@
 /***** Private Headers start *****/
 #include "../SHT31/SHT31.h"
 #include "../BMP280/bmp280.h"
+#include "../GY30/GY30.h"
 /***** Private Headers end *****/
 
 int main()
@@ -56,6 +57,11 @@ int main()
     printf("The temperature is %.2f, the pressure is %.2f hPa.\n", bmp280_data.temp, (bmp280_data.press / 100.0));
 #endif
     BMP280_deinit();
+
+    //GY30 test
+    GY30_init(1, GY30_ADDR_L, GY30_MODE);
+    GY30_getData(GY30_ADDR_L);
+    GY30_deinit();
 
     return 0;
 }
