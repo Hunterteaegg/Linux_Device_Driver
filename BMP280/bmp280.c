@@ -1,3 +1,21 @@
+ /****** LICENSE TERM ******
+ Copyright (C) <year>2020  <author>hunterteaegg <email>hunterteaegg@163.com
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+****** LICENSE TERM ******/
+
+/***** Public Headers start *****/
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
@@ -6,9 +24,14 @@
 #include <linux/types.h>
 #include <linux/spi/spidev.h>
 #include <stdlib.h>
-#include "bmp280.h"
+/***** Public Headers end *****/
 
-int g_file;
+/***** Private Headers start *****/
+#include "bmp280.h"
+/***** Private Headers end *****/
+
+/***** Global Variable start *****/
+int g_file; //file description
 struct spi_ioc_transfer *g_msg = NULL;
 uint8_t *g_rx_buff = NULL;
 uint8_t *g_tx_buff = NULL;
@@ -25,12 +48,41 @@ BMP280_SETTINGS default_settings = {
     .filter_coefficient = FILTER_MODE_4,
     .spi3w = SPI3W_DISABLE,
 };
+/***** Global Variable end *****/
 
+/***** Static funtion declearation start *****/
+/*
+ * @brief transmit data to specific address
+ * @param addr The address that will be sent to
+ * @param data The data that will be sent
+ * @return {none}
+ */
 static void BMP280_TxData(uint8_t addr, uint8_t data);
+
+#ifdef DEBUG
+/*
+ * @brief receive data from specific address
+ * @param data The address that we want to receive from
+ * @return the data on specific address
+ */
 static uint8_t BMP280_RxData(uint8_t addr);
+#endif
+
+/*
+ * @brief get values from BMP280 compensation registers
+ * @param {none}
+ * @return {none}
+ */
 static void BMP280_getDig(void);
+
+/*
+ * @brief get raw data from BMP280
+ * @param {none}
+ * @return {none}
+ */
 static BMP280_RAWDATA_T BMP280_getRawData(void);
 
+//compensation algorithm from datasheet
 #ifdef FIX_POINT
 static int32_t bmp280_compensate_T_int32(int32_t adc_T);
 static uint32_t bmp280_compensate_P_int32(int32_t adc_P);
@@ -40,6 +92,7 @@ typedef int32_t BMP280_S32_t;
 static double bmp280_compensate_T_double(BMP280_S32_t adc_T);
 static double bmp280_compensate_P_double(BMP280_S32_t adc_P);
 #endif
+/***** Static function declearation end *****/
 
 int BMP280_init(BMP280_SETTINGS handle, int p_node, int c_node)
 {
@@ -84,6 +137,7 @@ int BMP280_init(BMP280_SETTINGS handle, int p_node, int c_node)
     printf("SPI Mode are tx:%d, rx:%d.\n",mode,mode);
 #endif
     
+    //setting BMP280 work mode
     uint8_t config = ((uint8_t)(handle.standy_time)<<5) | ((uint8_t)(handle.filter_coefficient)<<2) | ((uint8_t)(handle.spi3w));
 	uint8_t ctrl_meas = ((uint8_t)(handle.oversampling_temp)<<5) | ((uint8_t)(handle.oversampling_press)<<2) | ((uint8_t)(handle.powermode));
 
@@ -157,6 +211,7 @@ static void BMP280_TxData(uint8_t addr, uint8_t data)
     g_msg = NULL;
 }
 
+#ifdef DEBUG
 static uint8_t BMP280_RxData(uint8_t addr)
 {
     g_tx_buff = (uint8_t *)malloc(2 * sizeof(uint8_t));
@@ -212,6 +267,7 @@ static uint8_t BMP280_RxData(uint8_t addr)
 
     return returnValue;
 }
+#endif
 
 static void BMP280_getDig(void)
 {

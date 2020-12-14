@@ -17,11 +17,13 @@
 
 /***** Public Headers start *****/
 #include <stdio.h>
-#include "../SHT31/SHT31.h"
-#include "../BMP280/bmp280.h"
 #include <unistd.h>
 /***** Public Headers end *****/
 
+/***** Private Headers start *****/
+#include "../SHT31/SHT31.h"
+#include "../BMP280/bmp280.h"
+/***** Private Headers end *****/
 
 int main()
 {
@@ -42,8 +44,10 @@ int main()
     .spi3w = SPI3W_DISABLE,
     };
     BMP280_init(settings, 0, 0);
-    //BMP280_RxData(0xD0);
-    sleep(1);
+#ifdef DEBUG
+    BMP280_RxData(0xD0);
+#endif
+    sleep(1);   //wait for convertion
     BMP280_DATA_T bmp280_data = BMP280_getData();
 #ifdef  FIX_POINT
     printf("The temp is %d, the press is %d.\n", bmp280_data.temp, bmp280_data.press);

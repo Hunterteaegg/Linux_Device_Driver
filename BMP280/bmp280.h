@@ -22,10 +22,11 @@
 #include <stdint.h>
 /***** Public Headers end *****/
 
-/***** Platform dependence *****/
+/***** Platform dependence start *****/
 //Uncomment one below
 //#define FIX_POINT   
 #define FLOAT_POINT 
+/***** Platform dependence end *****/
 
 /***** Type Definition start *****/
 //BMP280 memory map
@@ -151,12 +152,30 @@ typedef struct {
 	double press;
 } BMP280_DATA_T;
 #endif
-
 /***** Type Definiton end *****/
 
 /***** Public Interfaces start *****/
+/*
+ * @brief init BMP280 SPI device
+ * @param handle The options set of BMP280
+ * @param p_node the SPI parent node
+ * @param c_node the SPI child node
+ * @return 0 means normal but others means failed.
+ */
 int BMP280_init(BMP280_SETTINGS handle, int p_node, int c_node);
+
+/*
+ * @brief get data from BMP280
+ * @param {none}
+ * @return {none}
+ */
 BMP280_DATA_T BMP280_getData(void);
+
+/*
+ * @brief deint BMP280 device
+ * @param {none}
+ * @return 0 means normal but others means failed.
+ */
 int BMP280_deinit(void);
 /***** Public Interfaces end *****/
 #endif

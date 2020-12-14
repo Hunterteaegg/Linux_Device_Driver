@@ -49,7 +49,6 @@ struct i2c_rdwr_ioctl_data g_command_ioctl; //single I2C ioctl parameters to ioc
 /***** Public Interfaces start *****/
 int SHT31_init(const int adapter_node)
 {
-    int res;
     char filename[20];
 
     memset((void *)&g_msg,0,sizeof(g_msg));
@@ -122,6 +121,11 @@ SHT31_DATA_T SHT31_read_data(const u8 addr)
 
     sleep(1);   //sleep for waiting for convertion
     res = ioctl(g_file, I2C_SLAVE | I2C_RDWR, &g_command_ioctl);
+    if(res < 0)
+    {
+        perror("send I2C message failed.\n");
+        exit(-1);
+    }
 
 #if DEBUG_SHT31
     printf("the first res is %d.\n",res);
