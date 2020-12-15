@@ -22,6 +22,8 @@
 #define DEBUG_OPEN  1
 #define DEBUG_CLOSE 0
 
-#define DEBUG_SHT31 (DEBUG_CLOSE)
+#define DEBUG_SHT31     (DEBUG_CLOSE)
+#define DEBUG_BMP280    (DEBUG_CLOSE)
+#define DEBUG_GY30      (DEBUG_CLOSE)    
 
 #endif

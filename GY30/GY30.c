@@ -51,7 +51,10 @@ void GY30_init(const int adapter_node, uint8_t addr, uint8_t com)
         fprintf(stderr, "open /dev/i2c-%d failed.\n", adapter_node);
         exit(-1);
     }
+
+#if DEBUG_GY30
     printf("open /dev/i2c-%d successfully.\n", adapter_node);
+#endif
 
     g_msg = (struct i2c_msg *)malloc(1 * sizeof(struct i2c_msg));
     if(NULL == g_msg)
@@ -80,7 +83,10 @@ void GY30_init(const int adapter_node, uint8_t addr, uint8_t com)
         fprintf(stderr, "send I2C message failed.\n");
         exit(-1);
     }
+
+#if DEBUG_GY30
     printf("send I2C init message successfully.\n");
+#endif
 
 #if ((GY30_MODE & 0x03) == 0x03)
     usleep(50 * 1000);
@@ -129,7 +135,9 @@ double GY30_getData(uint8_t addr)
         fprintf(stderr, "send I2C power-on message failed.\n");
         exit(-1);
     }
+#if DEBUG_GY30
     printf("send I2C power-on message successfully.\n");
+#endif
     
 #if ((GY30_MODE & 0x03) == 0x03)
     usleep(50 * 1000);
@@ -159,10 +167,14 @@ double GY30_getData(uint8_t addr)
         fprintf(stderr, "send I2C read message failed.\n");
         exit(-1);
     }
+#if DEBUG_GY30
     printf("send I2C read message succcessfully.\n");
+#endif
 
     data = ((buff[0] << 8) | buff[1]);
+#if DEBUG_GY30
     printf("The light is %f.\n", (data / (double)1.2));
+#endif
 
     free(g_msg);
     g_msg = NULL;

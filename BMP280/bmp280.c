@@ -28,6 +28,7 @@
 
 /***** Private Headers start *****/
 #include "bmp280.h"
+#include "../test/debug.h"
 /***** Private Headers end *****/
 
 /***** Global Variable start *****/
@@ -110,7 +111,7 @@ int BMP280_init(BMP280_SETTINGS handle, int p_node, int c_node)
         perror("open /dev/spidev*.* device failed. \n");
         exit(-1);
     }
-#ifdef DEBUG
+#if DEBUG_BMP280
     printf("open /dev/spidev%d.%d successfully.\n", p_node, c_node);
 #endif
     free(pathName);
@@ -132,7 +133,7 @@ int BMP280_init(BMP280_SETTINGS handle, int p_node, int c_node)
     res = ioctl(g_file, SPI_IOC_RD_BITS_PER_WORD, &bit_per_word);
     res = ioctl(g_file, SPI_IOC_WR_BITS_PER_WORD, &bit_per_word);
 
-#ifdef DEBUG
+#if DEBUG_BMP280
     printf("setting SPI Mode successfully.\n");
     printf("SPI Mode are tx:%d, rx:%d.\n",mode,mode);
 #endif
@@ -168,7 +169,7 @@ int BMP280_deinit(void)
 {
     close(g_file);
 
-#ifdef DEBUG
+#if DEBUG_BMP280
     printf("close spi device BMP280 successfully.\n");
 #endif
 
@@ -201,7 +202,7 @@ static void BMP280_TxData(uint8_t addr, uint8_t data)
         exit(-1);
     }
 
-#ifdef DEBUG
+#if DEBUG_BMP280
     printf("SPI write successfully.\n");
 #endif
 
@@ -211,7 +212,7 @@ static void BMP280_TxData(uint8_t addr, uint8_t data)
     g_msg = NULL;
 }
 
-#ifdef DEBUG
+#if DEBUG_BMP280
 static uint8_t BMP280_RxData(uint8_t addr)
 {
     g_tx_buff = (uint8_t *)malloc(2 * sizeof(uint8_t));
@@ -370,7 +371,7 @@ static BMP280_RAWDATA_T BMP280_getRawData(void)
         exit(-1);
     }
 
-#ifdef DEBUG
+#if DEBUG_BMP280
     for(int i = 0;i < sizeof(g_rx_buff); i++)
     {
         printf("The value of rawData[%d] is 0x%02X.\n", i, g_rx_buff[i]);

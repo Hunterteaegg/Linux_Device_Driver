@@ -60,7 +60,7 @@ int main()
 
     //GY30 test
     GY30_init(1, GY30_ADDR_L, GY30_MODE);
-    GY30_getData(GY30_ADDR_L);
+    printf("The luminance is %.2f lx.\n", GY30_getData(GY30_ADDR_L));
     GY30_deinit();
 
     return 0;
