@@ -1,18 +1,18 @@
- /****** LICENSE TERM ******
- Copyright (C) <year>2020  <author>hunterteaegg <email>hunterteaegg@163.com
+/****** LICENSE TERM ******
+Copyright (C) <year>2020  <author>hunterteaegg <email>hunterteaegg@163.com
 
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
+   This program is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ****** LICENSE TERM ******/
 
 /***** Public Headers begin*****/
@@ -51,22 +51,22 @@ int SHT31_init(const int adapter_node)
 {
     char filename[20];
 
-    memset((void *)&g_msg,0,sizeof(g_msg));
-    snprintf(filename, 19, "/dev/i2c-%d",adapter_node);
+    memset((void *)&g_msg, 0, sizeof(g_msg));
+    snprintf(filename, 19, "/dev/i2c-%d", adapter_node);
     g_file = open(filename, O_RDWR);
 
-    if(g_file < 0)
+    if (g_file < 0)
     {
 
 #if DEBUG_SHT31
-        fprintf(stderr,"open /dev/i2c-%d failed.\n",adapter_node);
+        fprintf(stderr, "open /dev/i2c-%d failed.\n", adapter_node);
 #endif
 
         exit(-1);
     }
 
 #if DEBUG_SHT31
-    printf("open /dev/i2c-%d successfully.\n",adapter_node);
+    printf("open /dev/i2c-%d successfully.\n", adapter_node);
 #endif
 
     //Initial g_command_ioctl
@@ -76,11 +76,12 @@ int SHT31_init(const int adapter_node)
     return 0;
 }
 
-int SHT31_send_command(const u8 addr,const u8 com_MSB,const u8 com_LSB)
+int SHT31_send_command(const u8 addr, const u8 com_MSB, const u8 com_LSB)
 {
     int res;
-    u8 command[2] = {
-        com_MSB,com_LSB,
+    u8 command[2] =
+    {
+        com_MSB, com_LSB,
     };
 
     g_msg.addr = addr;
@@ -90,11 +91,11 @@ int SHT31_send_command(const u8 addr,const u8 com_MSB,const u8 com_LSB)
 
     res = ioctl(g_file, I2C_SLAVE | I2C_RDWR, &g_command_ioctl);
 
-    if(res < 0)
+    if (res < 0)
     {
 
 #if DEBUG_SHT31
-        fprintf(stderr, "send I2C command 0x%0X 0x%0X failed.\n",com_MSB, com_LSB);
+        fprintf(stderr, "send I2C command 0x%0X 0x%0X failed.\n", com_MSB, com_LSB);
 #endif
 
         exit(-1);
@@ -121,22 +122,22 @@ SHT31_DATA_T SHT31_read_data(const u8 addr)
 
     sleep(1);   //sleep for waiting for convertion
     res = ioctl(g_file, I2C_SLAVE | I2C_RDWR, &g_command_ioctl);
-    if(res < 0)
+    if (res < 0)
     {
         perror("send I2C message failed.\n");
         exit(-1);
     }
 
 #if DEBUG_SHT31
-    printf("the first res is %d.\n",res);
+    printf("the first res is %d.\n", res);
 #endif
 
     sleep(1);
 
-#if DEBUG_SHT31 
-    for(int i = 0; i < sizeof(buff); i++)
+#if DEBUG_SHT31
+    for (int i = 0; i < sizeof(buff); i++)
     {
-        printf("0x%0X ",buff[i]);
+        printf("0x%0X ", buff[i]);
     }
     printf("\n");
 #endif
@@ -145,17 +146,17 @@ SHT31_DATA_T SHT31_read_data(const u8 addr)
     double temp = (-45) + 175 * (temp_raw / (double)((0x01UL << 16) - 1));
     g_data.temp = temp;
     returnData.temp = temp;
-   
+
     u16 humi_raw = ((u16)buff[3] << 8) | (u16)buff[4];
     double humi = 100 * (humi_raw / (double)((0x01UL << 16) - 1));
     g_data.humi = humi;
     returnData.humi = humi;
 
 #if DEBUG_SHT31
-    printf("the temp is %f.\n",temp);
-    printf("the humi is %f.\n",humi);
-    printf("crc temp is 0x%2X.\n",CRC8_compute(buff, 2, 0x31));
-    printf("crc humi is 0x%2X.\n",CRC8_compute(buff + 3, 2, 0x31));
+    printf("the temp is %f.\n", temp);
+    printf("the humi is %f.\n", humi);
+    printf("crc temp is 0x%2X.\n", CRC8_compute(buff, 2, 0x31));
+    printf("crc humi is 0x%2X.\n", CRC8_compute(buff + 3, 2, 0x31));
 #endif
 
     return returnData;
@@ -163,20 +164,20 @@ SHT31_DATA_T SHT31_read_data(const u8 addr)
 
 int SHT31_deinit(void)
 {
-   return close(g_file);
+    return close(g_file);
 }
 
-u8 CRC8_compute(const u8 *pdat, short len,const u8 factor)
+u8 CRC8_compute(const u8 *pdat, short len, const u8 factor)
 {
     u8 j;
     u8 crc = 0xFF;
 
-    while(len--)
+    while (len--)
     {
         crc ^= (*pdat++);
-        for(j = 8; j > 0; j--)
+        for (j = 8; j > 0; j--)
         {
-            if(crc & 0x80)
+            if (crc & 0x80)
             {
                 crc = (crc << 1) ^ factor;
             }
@@ -187,6 +188,6 @@ u8 CRC8_compute(const u8 *pdat, short len,const u8 factor)
         }
     }
 
-    return crc;    
+    return crc;
 }
 /***** Public Interfaces end *****/

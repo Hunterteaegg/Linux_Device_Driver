@@ -36,13 +36,14 @@ int main()
     printf("The temperature is %.2f, the humidity is %.2f%%.\n", sht31_data.temp, sht31_data.humi);
 
     //BMP280 test
-    BMP280_SETTINGS settings = {
-    .powermode = POWER_MODE_NORMAL,
-    .oversampling_temp = OVERSAMPLING_x1,
-    .oversampling_press = OVERSAMPLING_x4,
-    .standy_time = STANDBY_TIME_005,
-    .filter_coefficient = FILTER_MODE_4,
-    .spi3w = SPI3W_DISABLE,
+    BMP280_SETTINGS settings =
+    {
+        .powermode = POWER_MODE_NORMAL,
+        .oversampling_temp = OVERSAMPLING_x1,
+        .oversampling_press = OVERSAMPLING_x4,
+        .standy_time = STANDBY_TIME_005,
+        .filter_coefficient = FILTER_MODE_4,
+        .spi3w = SPI3W_DISABLE,
     };
     BMP280_init(settings, 0, 0);
 #ifdef DEBUG

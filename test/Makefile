@@ -16,7 +16,19 @@
 #****** LICENSE TERM ******/
 
 objects = main.o ../SHT31/SHT31.o ../GY30/GY30.o ../BMP280/BMP280.o
-
+sources = main.c ../SHT31/SHT31.c ../GY30/GY30.c ../BMP280/BMP280.c 
+headers = debug.h ../SHT31/SHT31.h ../GY30/GY30.h ../BMP280/BMP280.h 
+astyleParam = --style=allman \
+              --indent=spaces=4 \
+              --indent-preproc-block \
+              --pad-oper \
+              --pad-header \
+              --unpad-paren \
+              --suffix=none \
+              --align-pointer=name \
+              --lineend=linux \
+              --convert-tabs \
+              --verbose
 
 test : $(objects)
 	cc -o test $(objects)
@@ -37,3 +49,7 @@ SHT31.o : SHT31.h
 .PHONY: clean
 clean : 
 	rm test $(objects)
+
+.PHONY: astyle
+astyle : 
+	astyle $(astyleParam) $(sources) $(headers)
