@@ -27,7 +27,7 @@
 /***** Public Headers end *****/
 
 /***** Private Headers start *****/
-#include "bmp280.h"
+#include "BMP280.h"
 #include "../test/debug.h"
 /***** Private Headers end *****/
 
