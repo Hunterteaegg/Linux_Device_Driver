@@ -28,7 +28,7 @@
 #include <sys/ioctl.h>
 #include <unistd.h>
 #include "SHT31.h"
-#include "debug.h"
+#include "../test/debug.h"
 #include <string.h>
 
 /***** Public Headers end *****/
@@ -39,11 +39,11 @@ typedef uint16_t         u16;   //16-bitwidth datatype
 
 
 /***** Global Variable start *****/
-int g_file;                                 //device file descriptor
-int g_adapter_nr = 1;                       //device node
-SHT31_DATA_T g_data;                        //SHT31 final data
-struct i2c_msg g_msg;                       //single I2C transaction message
-struct i2c_rdwr_ioctl_data g_command_ioctl; //single I2C ioctl parameters to ioctl()
+static int g_file;                                 //device file descriptor
+static int g_adapter_nr = 1;                       //device node
+static SHT31_DATA_T g_data;                        //SHT31 final data
+static struct i2c_msg g_msg;                       //single I2C transaction message
+static struct i2c_rdwr_ioctl_data g_command_ioctl; //single I2C ioctl parameters to ioctl()
 /***** Global Variable end *****/
 
 /***** Public Interfaces start *****/

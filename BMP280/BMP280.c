@@ -32,16 +32,16 @@
 /***** Private Headers end *****/
 
 /***** Global Variable start *****/
-int g_file; //file description
-struct spi_ioc_transfer *g_msg = NULL;
-uint8_t *g_rx_buff = NULL;
-uint8_t *g_tx_buff = NULL;
+static int g_file; //file description
+static struct spi_ioc_transfer *g_msg = NULL;
+static uint8_t *g_rx_buff = NULL;
+static uint8_t *g_tx_buff = NULL;
 typedef struct {
     uint32_t rawTemp;
     uint32_t rawPress;
 } BMP280_RAWDATA_T;
 
-BMP280_SETTINGS default_settings = {
+static BMP280_SETTINGS default_settings = {
     .powermode = POWER_MODE_NORMAL,
     .oversampling_temp = OVERSAMPLING_x1,
     .oversampling_press = OVERSAMPLING_x4,

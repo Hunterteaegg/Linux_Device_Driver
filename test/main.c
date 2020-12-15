@@ -22,7 +22,7 @@
 
 /***** Private Headers start *****/
 #include "../SHT31/SHT31.h"
-#include "../BMP280/bmp280.h"
+#include "../BMP280/BMP280.h"
 #include "../GY30/GY30.h"
 /***** Private Headers end *****/
 

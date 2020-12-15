@@ -35,9 +35,9 @@
 #include "GY30.h"
 
 /***** Global Variable start *****/
-int g_file;
-struct i2c_msg *g_msg;
-struct i2c_rdwr_ioctl_data *g_ioctl_data;
+static int g_file;
+static struct i2c_msg *g_msg;
+static struct i2c_rdwr_ioctl_data *g_ioctl_data;
 /***** Global Variable end *****/
 
 void GY30_init(const int adapter_node, uint8_t addr, uint8_t com)
