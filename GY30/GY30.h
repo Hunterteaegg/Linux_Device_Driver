@@ -39,6 +39,28 @@
 #define GY30_MODE               GY30_ONETIME_H_MODE
 /***** Private Macro Definition end *****/
 
+/***** Public Interfaces start *****/
+
+/*
+ * @brief init GY30 device
+ * @param adapter_node I2C adapter device node located in /dev/i2c-*
+ * @param addr The address of GY30
+ * @param com The command sent to GY30
+ * @return {none}
+ */
 void GY30_init(const int adapter_node, uint8_t addr, uint8_t com);
+
+/*
+ * @brief get data from GY30
+ * @param addr The address of GY30
+ * @return The data of GY30
+ * @note different modes have different complements
+ */
 double GY30_getData(uint8_t addr);
+
+/*
+ * @brief deinit GY30
+ * @param {none}
+ * @return {none}
+ */
 void GY30_deinit(void);
