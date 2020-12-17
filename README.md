@@ -28,8 +28,14 @@
 
 ## DRIVER LIST
 ### SHT31 
-    worked in I2C bus
+    Humidity and Temperature Sensor
+    Voltage : 2.15V - 5.5V
+    Interface : I2C
 ### BMP280
-    worked in SPI bus
-### GY-30
-    worked in I2C bus
+    Digital Pressure and Temperature Sensor
+    Voltage : 1.7V - 3.6V
+    Interface : I2C and SPI
+### GY-30 (BH1750FVI)
+    Digital 16 bit Serial Output Type Ambient Light Sensor IC
+    Voltage : 2.4V - 3.6V
+    Interface : I2C
