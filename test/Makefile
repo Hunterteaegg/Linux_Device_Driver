@@ -31,7 +31,7 @@ astyleParam = --style=allman \
               --verbose
 
 test : $(objects)
-	cc -o test $(objects)
+	cc -o test.out $(objects)
 #main.o : debug.h main.c 
 #	cc -c main.c
 #BMP280.o : debug.h BMP280.h BMP280.c
@@ -48,7 +48,7 @@ SHT31.o : SHT31.h
 
 .PHONY: clean
 clean : 
-	rm test $(objects)
+	rm test.out $(objects)
 
 .PHONY: astyle
 astyle : 
