@@ -28,12 +28,14 @@
 
 int main()
 {
+	/*
     //SHT31 test
     SHT31_init(SHT31_NODE);
     SHT31_send_command(SHT31_ADDR, SHT31_COM_N_CS, SHT31_COM_N_CS_H);
     SHT31_DATA_T sht31_data = SHT31_read_data(SHT31_ADDR);
     SHT31_deinit();
     printf("The temperature is %.2f, the humidity is %.2f%%.\n", sht31_data.temp, sht31_data.humi);
+	*/
 
     //BMP280 test
     BMP280_SETTINGS settings =
@@ -59,10 +61,12 @@ int main()
 #endif
     BMP280_deinit();
 
+	/*
     //GY30 test
     GY30_init(1, GY30_ADDR_L, GY30_MODE);
     printf("The luminance is %.2f lx.\n", GY30_getData(GY30_ADDR_L));
     GY30_deinit();
+	*/
 
     return 0;
 }

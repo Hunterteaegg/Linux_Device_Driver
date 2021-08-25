@@ -15,9 +15,9 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #****** LICENSE TERM ******/
 
-objects = main.o ../SHT31/SHT31.o ../GY30/GY30.o ../BMP280/BMP280.o
-sources = main.c ../SHT31/SHT31.c ../GY30/GY30.c ../BMP280/BMP280.c 
-headers = debug.h ../SHT31/SHT31.h ../GY30/GY30.h ../BMP280/BMP280.h 
+objects = main.o ../BMP280/BMP280.o
+sources = main.c ../BMP280/BMP280.c 
+headers = debug.h ../BMP280/BMP280.h 
 astyleParam = --style=allman \
               --indent=spaces=4 \
               --indent-preproc-block \
@@ -43,8 +43,8 @@ test : $(objects)
 
 $(objects) : debug.h 
 BMP280.o : BMP280.h 
-GY30.o : GY30.h 
-SHT31.o : SHT31.h 
+#GY30.o : GY30.h 
+#SHT31.o : SHT31.h 
 
 .PHONY: clean
 clean : 
