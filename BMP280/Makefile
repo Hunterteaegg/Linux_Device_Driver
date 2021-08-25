@@ -1,0 +1,9 @@
+obj-m := BMP280.o
+CURRENT_PATH := $(shell pwd)
+LINUX_KERNEL_PATH := /home/pi/linux
+
+all:
+	make -C $(LINUX_KERNEL_PATH) M=$(CURRENT_PATH) modules
+clean:
+	make -C $(LINUX_KERNEL_PATH) M=$(CURRENT_PATH) clean
+
