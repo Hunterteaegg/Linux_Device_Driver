@@ -12,9 +12,14 @@
 #include <linux/kernel.h>
 #include <linux/init.h>
 #include <linux/i2c.h>
+#include <linux/errno.h>
 
 #include <linux/cdev.h>
 #include <linux/fs.h>
+
+#define BMP280_ADDR 0x76
+#define BMP280_REG_TEMP_XLSB 0xFC
+#define BMP280_REG_Cab00 0x88
 
 static struct i2c_adapter *i2c1_adapter;
 static struct i2c_client *bmp280_client;
@@ -39,7 +44,7 @@ MODULE_DEVICE_TABLE(i2c, bmp280_id);
 
 static const struct i2c_board_info i2c1_devices[] = {
 		{
-				I2C_BOARD_INFO("bosch,bmp280", 0x76),
+				I2C_BOARD_INFO("bosch,bmp280", BMP280_ADDR),
 		},
 };
 
@@ -88,24 +93,83 @@ static int bmp280_i2c_remove(struct i2c_client *client)
 		return 0;
 }
 
+static loff_t bmp280_cdev_llseek(struct file *filp, loff_t offset, int whence)
+{
+		switch(whence)
+		{
+				case SEEK_SET:
+				{
+						filp->f_pos = offset;
+						break;
+				}
+				case SEEK_CUR:
+				{
+						filp->f_pos += offset;
+						break;
+				}
+				case SEEK_END:
+				{
+					    filp->f_pos = BMP280_REG_TEMP_XLSB - offset;	
+						break;
+				}
+				default:
+				{
+						return -1;
+				}
+		}
+
+		return filp->f_pos;
+}
 static ssize_t bmp280_cdev_read(struct file *filp, char __user *buf, size_t count, loff_t *offset)
 {
-		char *string = "Your are reading BMP280.\n";
+		char reg_data[BMP280_REG_TEMP_XLSB - BMP280_REG_Cab00 + 1];
 
-		return copy_to_user(buf, string, (count <= 24 ? count : 24));
+		if((*offset > BMP280_REG_TEMP_XLSB) || (*offset < BMP280_REG_Cab00))
+		{
+				return -EFAULT;
+		}
+		if(count + *offset > BMP280_REG_TEMP_XLSB + 1)
+		{
+				count = BMP280_REG_TEMP_XLSB - *offset + 1;
+		}
+
+		i2c_master_send(bmp280_client, (const char*)offset, 1);
+		i2c_master_recv(bmp280_client, reg_data, count);
+
+		return copy_to_user(buf, reg_data, count);
+}
+
+static ssize_t bmp280_cdev_write(struct file *filp, const char __user *buf, size_t count, loff_t *offset)
+{
+		char reg_data[2];
+		int i, ret;
+
+		if(count > 2)
+		{
+				return -EINVAL;
+		}
+		ret = copy_from_user(reg_data, buf, count);
+
+		for(i = 0; i < count; i++)
+		{
+			    i2c_master_send(bmp280_client, (const char*)offset, 1);
+			    i2c_master_send(bmp280_client, &reg_data[i], sizeof(reg_data[i]));	
+				(*offset)++;
+		}
+		(*offset) -= count;
+
+		return count;
 }
 
 static int bmp280_cdev_open(struct inode *inode, struct file *filp)
 {
-		;
-
+		filp->f_pos = BMP280_REG_Cab00;
+		
 		return 0;
 }
 
 static int bmp280_cdev_release(struct inode *inode, struct file *filp)
 {
-		;
-
 		return 0;
 }
 
@@ -121,7 +185,9 @@ static struct i2c_driver bmp280_i2c_driver = {
 
 static struct file_operations bmp280_cdev_fops = {
 		.owner = THIS_MODULE,
+		.llseek = bmp280_cdev_llseek,
 		.read = bmp280_cdev_read,
+		.write = bmp280_cdev_write,
 		.open = bmp280_cdev_open,
 		.release = bmp280_cdev_release,
 };
