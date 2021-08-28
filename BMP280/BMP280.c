@@ -17,9 +17,16 @@
 #include <linux/cdev.h>
 #include <linux/fs.h>
 
-#define BMP280_ADDR 0x76
-#define BMP280_REG_TEMP_XLSB 0xFC
-#define BMP280_REG_Cab00 0x88
+#define BMP280_ADDR             0x76
+#define BMP280_REG_TEMP_XLSB    0xFC
+#define BMP280_REG_TEMP_MSB		0xFA
+#define BMP280_REG_PRESS_MSB    0xF7
+#define BMP280_REG_CONFIG       0xF5
+#define BMP280_REG_CTRLMEAS     0xF4
+#define BMP280_REG_STATUS       0xF3
+#define BMP280_REG_RESET        0xE0
+#define BMP280_REG_ID           0xD0
+#define BMP280_REG_Cab00        0x88
 
 static struct i2c_adapter *i2c1_adapter;
 static struct i2c_client *bmp280_client;
@@ -28,6 +35,148 @@ static struct device *bmp280_device;
 
 static struct file_operations bmp280_cdev_fops;
 static struct BMP280_driver bmp280_driver;
+
+static ssize_t bmp280_attr_regs_temp_show(struct device *dev, struct device_attribute *attr, char *buff)
+{
+		char temp[3];
+		char reg_addr[1] = { BMP280_REG_TEMP_MSB };
+		i2c_master_send(bmp280_client, reg_addr, ARRAY_SIZE(reg_addr));
+		i2c_master_recv(bmp280_client, temp, ARRAY_SIZE(temp));
+
+		memcpy(buff, temp, ARRAY_SIZE(temp));
+
+		return ARRAY_SIZE(temp);
+}
+
+static ssize_t bmp280_attr_regs_press_show(struct device *dev, struct device_attribute *attr, char *buff)
+{
+		char press[3];
+		char reg_addr[1] = { BMP280_REG_PRESS_MSB };
+		i2c_master_send(bmp280_client, reg_addr, ARRAY_SIZE(reg_addr));
+		i2c_master_recv(bmp280_client, press, ARRAY_SIZE(press));
+
+		memcpy(buff, press, ARRAY_SIZE(press));
+
+		return ARRAY_SIZE(press);
+}
+
+static ssize_t bmp280_attr_reg_id_show(struct device *dev, struct device_attribute *attr, char *buff)
+{
+		char id[1];
+		char reg_addr[1] = { BMP280_REG_ID };
+		i2c_master_send(bmp280_client, reg_addr, ARRAY_SIZE(reg_addr));
+		i2c_master_recv(bmp280_client, id, ARRAY_SIZE(id));
+
+		memcpy(buff, id, ARRAY_SIZE(id));
+
+		return ARRAY_SIZE(id);
+}
+
+static ssize_t bmp280_attr_regs_calliration_show(struct device *dev, struct device_attribute *attr, char *buff)
+{
+		char callibration[24];
+		char reg_addr[1] = { BMP280_REG_Cab00 };
+
+		i2c_master_send(bmp280_client, reg_addr, ARRAY_SIZE(reg_addr));
+		i2c_master_recv(bmp280_client, callibration, ARRAY_SIZE(callibration));
+
+		memcpy(buff, callibration, ARRAY_SIZE(callibration));
+
+		return ARRAY_SIZE(callibration);
+}
+
+static ssize_t bmp280_attr_reg_config_show(struct device *dev, struct device_attribute *attr, char *buff)
+{
+		char config[1];
+		char reg_addr[1] = { BMP280_REG_CONFIG };
+
+		i2c_master_send(bmp280_client, reg_addr, ARRAY_SIZE(reg_addr));
+		i2c_master_recv(bmp280_client, config, ARRAY_SIZE(config));
+
+		memcpy(buff, config, ARRAY_SIZE(config));
+
+		return ARRAY_SIZE(config);
+}
+
+static ssize_t bmp280_attr_reg_config_store(struct device *dev, struct device_attribute *attr, const char *buff, size_t count)
+{
+		char data[2];
+
+		if(count != 1)
+		{
+			return 0;
+		}
+		data[0] = BMP280_REG_CONFIG;
+		data[1] = buff[0];
+
+		i2c_master_send(bmp280_client, data, ARRAY_SIZE(data));
+
+		return count;
+}
+
+static ssize_t bmp280_attr_reg_ctrlmeas_show(struct device *dev, struct device_attribute *attr, char *buff)
+{
+		char ctrlmeas[1];
+		char reg_addr[1] = { BMP280_REG_CTRLMEAS };
+
+		i2c_master_send(bmp280_client, reg_addr, ARRAY_SIZE(reg_addr));
+		i2c_master_recv(bmp280_client, ctrlmeas, ARRAY_SIZE(ctrlmeas));
+
+		memcpy(buff, ctrlmeas, ARRAY_SIZE(ctrlmeas));
+
+		return ARRAY_SIZE(ctrlmeas);
+}
+
+static ssize_t bmp280_attr_reg_ctrlmeas_store(struct device *dev, struct device_attribute *attr, const char *buff, size_t count)
+{
+		char data[2];
+
+		if(count != 1)
+		{
+		    return 0;
+		}
+		data[0] = BMP280_REG_CTRLMEAS;
+		data[1] = buff[0];
+		i2c_master_send(bmp280_client, data, ARRAY_SIZE(data));
+
+		return count;
+}
+
+static ssize_t bmp280_attr_reg_status_show(struct device *dev, struct device_attribute *attr, char *buff)
+{
+        char status[1];
+		char reg_addr[1] = { BMP280_REG_STATUS };
+
+		i2c_master_send(bmp280_client, reg_addr, ARRAY_SIZE(reg_addr));
+		i2c_master_recv(bmp280_client, status, ARRAY_SIZE(status));
+
+		memcpy(buff, status, ARRAY_SIZE(status));
+
+		return ARRAY_SIZE(status);
+}
+
+static ssize_t bmp280_attr_reg_reset_store(struct device *dev, struct device_attribute *attr, const char *buff, size_t count)
+{
+		char data[2];
+		if(!buff)
+		{
+				return 0;
+		}
+		data[0] = BMP280_REG_RESET;
+		data[1] = buff[0];
+		i2c_master_send(bmp280_client, data, ARRAY_SIZE(data));
+
+		return count;
+}
+
+static DEVICE_ATTR(bmp280_reset, S_IWUSR, NULL, bmp280_attr_reg_reset_store);
+static DEVICE_ATTR(bmp280_status, S_IRUGO, bmp280_attr_reg_status_show, NULL);
+static DEVICE_ATTR(bmp280_ctrlmeas, (S_IRUGO | S_IWUSR), bmp280_attr_reg_ctrlmeas_show, bmp280_attr_reg_ctrlmeas_store);
+static DEVICE_ATTR(bmp280_config, (S_IRUGO | S_IWUSR), bmp280_attr_reg_config_show, bmp280_attr_reg_config_store); 
+static DEVICE_ATTR(bmp280_callibration, S_IRUGO, bmp280_attr_regs_calliration_show, NULL);
+static DEVICE_ATTR(bmp280_id, S_IRUGO, bmp280_attr_reg_id_show, NULL);
+static DEVICE_ATTR(bmp280_press, S_IRUGO, bmp280_attr_regs_press_show, NULL);
+static DEVICE_ATTR(bmp280_temp, S_IRUGO, bmp280_attr_regs_temp_show, NULL);
 
 struct BMP280_driver
 {
@@ -66,6 +215,7 @@ static int bmp280_i2c_probe(struct i2c_client *client, const struct i2c_device_i
 		bmp280_driver.bmp280_cdev.owner = THIS_MODULE;
 		bmp280_driver.bmp280_cdev.ops = &bmp280_cdev_fops;
 
+
 		ret = cdev_add(&bmp280_driver.bmp280_cdev, bmp280_driver.cdev_number, 1);
 		if(ret)
 		{
@@ -77,6 +227,14 @@ static int bmp280_i2c_probe(struct i2c_client *client, const struct i2c_device_i
 		}
 
 		bmp280_device = device_create(sensor_class, NULL, bmp280_driver.cdev_number, NULL, "BMP280");
+		device_create_file(bmp280_device, &dev_attr_bmp280_temp);
+		device_create_file(bmp280_device, &dev_attr_bmp280_press);
+		device_create_file(bmp280_device, &dev_attr_bmp280_config);
+		device_create_file(bmp280_device, &dev_attr_bmp280_ctrlmeas);
+		device_create_file(bmp280_device, &dev_attr_bmp280_status);
+		device_create_file(bmp280_device, &dev_attr_bmp280_reset);
+		device_create_file(bmp280_device, &dev_attr_bmp280_id);
+		device_create_file(bmp280_device, &dev_attr_bmp280_callibration);
 
 		printk(KERN_INFO "bosch,bmp280: probe");
 
@@ -85,41 +243,24 @@ static int bmp280_i2c_probe(struct i2c_client *client, const struct i2c_device_i
 
 static int bmp280_i2c_remove(struct i2c_client *client)
 {
-		device_destroy(sensor_class, bmp280_driver.cdev_number);
+		device_remove_file(bmp280_device, &dev_attr_bmp280_temp);
+		device_remove_file(bmp280_device, &dev_attr_bmp280_id);
+		device_remove_file(bmp280_device, &dev_attr_bmp280_press);
+		device_remove_file(bmp280_device, &dev_attr_bmp280_config);
+		device_remove_file(bmp280_device, &dev_attr_bmp280_ctrlmeas);
+		device_remove_file(bmp280_device, &dev_attr_bmp280_callibration);
+		device_remove_file(bmp280_device, &dev_attr_bmp280_status);
+		device_remove_file(bmp280_device, &dev_attr_bmp280_reset);
+
+        device_destroy(sensor_class, bmp280_driver.cdev_number);
 		cdev_del(&bmp280_driver.bmp280_cdev);
 		unregister_chrdev_region(bmp280_driver.cdev_number, 1);
+
 		printk(KERN_INFO "bosch,bmp280: remove");
 		
 		return 0;
 }
 
-static loff_t bmp280_cdev_llseek(struct file *filp, loff_t offset, int whence)
-{
-		switch(whence)
-		{
-				case SEEK_SET:
-				{
-						filp->f_pos = offset;
-						break;
-				}
-				case SEEK_CUR:
-				{
-						filp->f_pos += offset;
-						break;
-				}
-				case SEEK_END:
-				{
-					    filp->f_pos = BMP280_REG_TEMP_XLSB - offset;	
-						break;
-				}
-				default:
-				{
-						return -1;
-				}
-		}
-
-		return filp->f_pos;
-}
 static ssize_t bmp280_cdev_read(struct file *filp, char __user *buf, size_t count, loff_t *offset)
 {
 		char reg_data[BMP280_REG_TEMP_XLSB - BMP280_REG_Cab00 + 1];
@@ -137,28 +278,6 @@ static ssize_t bmp280_cdev_read(struct file *filp, char __user *buf, size_t coun
 		i2c_master_recv(bmp280_client, reg_data, count);
 
 		return copy_to_user(buf, reg_data, count);
-}
-
-static ssize_t bmp280_cdev_write(struct file *filp, const char __user *buf, size_t count, loff_t *offset)
-{
-		char reg_data[2];
-		int i, ret;
-
-		if(count > 2)
-		{
-				return -EINVAL;
-		}
-		ret = copy_from_user(reg_data, buf, count);
-
-		for(i = 0; i < count; i++)
-		{
-			    i2c_master_send(bmp280_client, (const char*)offset, 1);
-			    i2c_master_send(bmp280_client, &reg_data[i], sizeof(reg_data[i]));	
-				(*offset)++;
-		}
-		(*offset) -= count;
-
-		return count;
 }
 
 static int bmp280_cdev_open(struct inode *inode, struct file *filp)
@@ -185,9 +304,7 @@ static struct i2c_driver bmp280_i2c_driver = {
 
 static struct file_operations bmp280_cdev_fops = {
 		.owner = THIS_MODULE,
-		.llseek = bmp280_cdev_llseek,
 		.read = bmp280_cdev_read,
-		.write = bmp280_cdev_write,
 		.open = bmp280_cdev_open,
 		.release = bmp280_cdev_release,
 };
