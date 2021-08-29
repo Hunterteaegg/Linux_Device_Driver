@@ -263,27 +263,21 @@ static int bmp280_i2c_remove(struct i2c_client *client)
 
 static ssize_t bmp280_cdev_read(struct file *filp, char __user *buf, size_t count, loff_t *offset)
 {
-		char reg_data[BMP280_REG_TEMP_XLSB - BMP280_REG_Cab00 + 1];
+		char data[6];
+		char reg_addr[1] = { BMP280_REG_PRESS_MSB };
 
-		if((*offset > BMP280_REG_TEMP_XLSB) || (*offset < BMP280_REG_Cab00))
+		if(count <= 0)
 		{
-				return -EFAULT;
+				return 0;
 		}
-		if(count + *offset > BMP280_REG_TEMP_XLSB + 1)
-		{
-				count = BMP280_REG_TEMP_XLSB - *offset + 1;
-		}
+		i2c_master_send(bmp280_client, reg_addr, ARRAY_SIZE(reg_addr));
+		i2c_master_recv(bmp280_client, data, ARRAY_SIZE(data));
 
-		i2c_master_send(bmp280_client, (const char*)offset, 1);
-		i2c_master_recv(bmp280_client, reg_data, count);
-
-		return copy_to_user(buf, reg_data, count);
+		return copy_to_user(buf, data, (int)min(count, ARRAY_SIZE(data)));
 }
 
 static int bmp280_cdev_open(struct inode *inode, struct file *filp)
 {
-		filp->f_pos = BMP280_REG_Cab00;
-		
 		return 0;
 }
 
