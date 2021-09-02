@@ -1,4 +1,4 @@
-obj-m := BMP280.o
+obj-m := bmp280_driver.o
 CURRENT_PATH := $(shell pwd)
 LINUX_KERNEL_PATH := /home/pi/linux
 

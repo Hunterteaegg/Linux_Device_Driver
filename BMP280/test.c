@@ -11,8 +11,8 @@
 static BMP280_S32_t t_fine;
 static struct bmp280_handle_t bmp280_handle = {
 		.powermode = POWER_MODE_NORMAL,
-		.oversampling_temp = OVERSAMPLING_x1,
-		.oversampling_press = OVERSAMPLING_x4,
+		.oversampling_temp = OVERSAMPLING_x16,
+		.oversampling_press = OVERSAMPLING_x16,
 		.standby_time = STANDBY_TIME_005,
 		.filter_coefficient = FILTER_MODE_4,
 		.spi3w = SPI3W_DISABLE,
@@ -21,35 +21,35 @@ static struct bmp280_handle_t bmp280_handle = {
 static void get_calibration(void)
 {
 		int fd, num;
-		char calibration[24];
+		char compensate[24];
 
-		fd = open("/sys/devices/virtual/sensors/BMP280/bmp280_callibration", O_RDONLY);
+		fd = open("/sys/bus/i2c/devices/1-0076/bmp280_compensate", O_RDONLY);
 		if(fd < 0)
 		{
-				perror("open calibration file failed.");
+				perror("open bmp280_compensate file failed.");
 				exit(fd);
 		}
-		num = read(fd, calibration, 24);
-		printf("calibration: read %d bytes\n", num);
-		printf("calibration:");
+		num = read(fd, compensate, 24);
+		printf("compensate: read %d bytes\n", num);
+		printf("compensate:");
 		for(int i = 0; i < 24; i++)
 		{
-				printf("%d ", calibration[i]);
+				printf("%x ", compensate[i]);
 		}
 		printf("\n");
 
-		dig_T1 = (uint16_t)calibration[0] | ((uint16_t)calibration[1] << 8);
-		dig_T2 = (uint16_t)calibration[2] | ((uint16_t)calibration[3] << 8);
-		dig_T3 = (uint16_t)calibration[4] | ((uint16_t)calibration[5] << 8);
-		dig_P1 = (uint16_t)calibration[6] | ((uint16_t)calibration[7] << 8);
-		dig_P2 = (uint16_t)calibration[8] | ((uint16_t)calibration[9] << 8);
-		dig_P3 = (uint16_t)calibration[10] | ((uint16_t)calibration[11] << 8);
-		dig_P4 = (uint16_t)calibration[12] | ((uint16_t)calibration[13] << 8);
-		dig_P5 = (uint16_t)calibration[14] | ((uint16_t)calibration[15] << 8);
-		dig_P6 = (uint16_t)calibration[16] | ((uint16_t)calibration[17] << 8);
-		dig_P7 = (uint16_t)calibration[18] | ((uint16_t)calibration[19] << 8);
-		dig_P8 = (uint16_t)calibration[20] | ((uint16_t)calibration[21] << 8);
-		dig_P9 = (uint16_t)calibration[22] | ((uint16_t)calibration[23] << 8);
+		dig_T1 = (uint16_t)compensate[0] | ((uint16_t)compensate[1] << 8);
+		dig_T2 = (uint16_t)compensate[2] | ((uint16_t)compensate[3] << 8);
+		dig_T3 = (uint16_t)compensate[4] | ((uint16_t)compensate[5] << 8);
+		dig_P1 = (uint16_t)compensate[6] | ((uint16_t)compensate[7] << 8);
+		dig_P2 = (uint16_t)compensate[8] | ((uint16_t)compensate[9] << 8);
+		dig_P3 = (uint16_t)compensate[10] | ((uint16_t)compensate[11] << 8);
+		dig_P4 = (uint16_t)compensate[12] | ((uint16_t)compensate[13] << 8);
+		dig_P5 = (uint16_t)compensate[14] | ((uint16_t)compensate[15] << 8);
+		dig_P6 = (uint16_t)compensate[16] | ((uint16_t)compensate[17] << 8);
+		dig_P7 = (uint16_t)compensate[18] | ((uint16_t)compensate[19] << 8);
+		dig_P8 = (uint16_t)compensate[20] | ((uint16_t)compensate[21] << 8);
+		dig_P9 = (uint16_t)compensate[22] | ((uint16_t)compensate[23] << 8);
 }
 
 static double bmp280_compensate_T_double(BMP280_S32_t adc_T)
@@ -102,7 +102,7 @@ int bmp280_init(struct bmp280_handle_t *handle)
 				 (handle->oversampling_press << 2) | \
 				 (handle->powermode);
 		get_calibration();
-		fd = open("/sys/devices/virtual/sensors/BMP280/bmp280_config", O_WRONLY);
+		fd = open("/sys/bus/i2c/devices/1-0076/bmp280_config", O_WRONLY);
 		if(fd < 0)
 		{
 				perror("open bmp280_config failed");
@@ -110,7 +110,7 @@ int bmp280_init(struct bmp280_handle_t *handle)
 		write(fd, config, 1);
 		close(fd);
 
-		fd = open("/sys/devices/virtual/sensors/BMP280/bmp280_ctrlmeas", O_WRONLY);
+		fd = open("/sys/bus/i2c/devices/1-0076/bmp280_ctrlmeas", O_WRONLY);
 		if(fd < 0)
 		{
 				perror("open bmp280_ctrlmeas failed");
@@ -127,7 +127,7 @@ struct bmp280_data_t bmp280_getdata(void)
 		uint32_t temp_raw, press_raw;
 		int fd;
 
-		fd = open("/sys/devices/virtual/sensors/BMP280/bmp280_temp", O_RDONLY);
+		fd = open("/sys/bus/i2c/devices/1-0076/bmp280_temp", O_RDONLY);
 		if(fd < 0)
 		{
 				perror("open bmp280_temp failed");
@@ -135,7 +135,7 @@ struct bmp280_data_t bmp280_getdata(void)
 		read(fd, temp, 3);
 		close(fd);
 
-		fd = open("/sys/devices/virtual/sensors/BMP280/bmp280_press", O_RDONLY);
+		fd = open("/sys/bus/i2c/devices/1-0076/bmp280_press", O_RDONLY);
 		if(fd < 0)
 		{
 				perror("open bmp280_press failed");
