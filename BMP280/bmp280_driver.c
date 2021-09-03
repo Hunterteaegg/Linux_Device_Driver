@@ -140,11 +140,11 @@ static int bmp280_i2c_probe(struct i2c_client *client, const struct i2c_device_i
 		ret = sysfs_create_files(&client->dev.kobj, bmp280_attrs);
 		if(!ret)
 		{
-				printk("sysfs create files failed");
+				printk("sysfs create files successfully");
 		}
 		else
 		{
-				printk("sysfs create files successfully");
+				printk("sysfs create files failed");
 		}
 		printk(KERN_INFO "bosch,bmp280: probed");
 
