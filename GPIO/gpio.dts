@@ -1,0 +1,32 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+		compatible = "brcm,bcm2835";
+
+		fragment@0 {
+				target = <&gpio>;
+				__overlay__ { 
+					my_led_pin: my_led_pins@4 {
+							brcm,pins = <4>;
+							brcm,function = <1>;
+							brcm,pull = <0>;
+					};
+				};
+		};
+
+		fragment@1 {
+				target-path = "/";
+				__overlay__ {
+						my_led: my_leds@0 {
+								compatible = "My Device,LED";
+								pinctrl-names = "default";
+								pinctrl-0 = <&my_led_pin>;
+								status = "okay";
+
+								led-gpios = <&gpio 4 0>;
+						};
+				};
+		};
+};
+
